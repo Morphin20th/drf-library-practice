@@ -1,11 +1,14 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from book_service.models import Book
+
 
 class Borrowing(models.Model):
     borrow_date = models.DateField(auto_now_add=True)
     expected_return_date = models.DateField()
     actual_return_date = models.DateField(blank=True, null=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
 
     def clean(self):
         if self.expected_return_date <= self.borrow_date:
