@@ -16,5 +16,5 @@ class BorrowingSerializer(serializers.ModelSerializer):
         ]
 
 
-class BorrowingListSerializer(BorrowingSerializer):
+class BorrowingReadSerializer(BorrowingSerializer):
     book = BookSerializer(read_only=True)
