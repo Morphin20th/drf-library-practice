@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 
 from book_service.models import Book
 from user.models import User
@@ -59,6 +59,17 @@ class Borrowing(models.Model):
         using=None,
         update_fields=None,
     ):
+        is_new = self.pk is None
+
+        with transaction.atomic():
+            if is_new:
+                if self.book.inventory < 1:
+                    raise ValidationError(
+                        "Cannot borrow book. Inventory must be at least 1."
+                    )
+                self.book.inventory -= 1
+                self.book.save(update_fields=["inventory"])
+
         if self.actual_return_date:
             self.is_active = False
 
