@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "book_service",
     "user",
     "borrowing",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -131,7 +132,8 @@ AUTH_USER_MODEL = "user.User"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
