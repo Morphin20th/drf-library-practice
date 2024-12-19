@@ -16,6 +16,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
             "actual_return_date",
             "book",
             "user",
+            "is_active",
         ]
 
 
@@ -27,3 +28,18 @@ class BorrowingDetailSerializer(BorrowingSerializer):
 class BorrowingListSerializer(BorrowingSerializer):
     book = SlugRelatedField(read_only=True, slug_field="title")
     user = serializers.SlugRelatedField(read_only=True, slug_field="email")
+
+
+class BorrowingCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Borrowing
+        fields = [
+            "expected_return_date",
+            "book",
+        ]
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+
+        validated_data["user"] = request.user
+        return super().create(validated_data)

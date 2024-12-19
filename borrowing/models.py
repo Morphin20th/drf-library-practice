@@ -25,18 +25,20 @@ class Borrowing(models.Model):
         user,
         error_to_raise,
     ):
-        if expected_return_date <= borrow_date:
-            raise error_to_raise(
-                {
-                    "expected_return_date": "Expected return date must be later than the borrow date."
-                }
-            )
-        if actual_return_date <= borrow_date:
-            raise error_to_raise(
-                {
-                    "actual_return_date": "Actual return date must be later than the borrow date."
-                }
-            )
+        if expected_return_date and borrow_date:
+            if expected_return_date <= borrow_date:
+                raise error_to_raise(
+                    {
+                        "expected_return_date": "Expected return date must be later than the borrow date."
+                    }
+                )
+        if actual_return_date and borrow_date:
+            if actual_return_date <= borrow_date:
+                raise error_to_raise(
+                    {
+                        "actual_return_date": "Actual return date must be later than the borrow date."
+                    }
+                )
         if book.inventory == 0:
             raise error_to_raise({"book.inventory": "Inventory must be more than 0"})
         if user.borrowings.filter(is_active=True).count() == 1:
