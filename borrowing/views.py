@@ -5,11 +5,15 @@ from borrowing.serializers import (
     BorrowingSerializer,
     BorrowingDetailSerializer,
     BorrowingListSerializer,
+    BorrowingCreateSerializer,
 )
 
 
 class BorrowingViewSet(
-    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
 ):
     queryset = Borrowing.objects.all()
 
@@ -18,4 +22,6 @@ class BorrowingViewSet(
             return BorrowingListSerializer
         if self.action == "retrieve":
             return BorrowingDetailSerializer
+        if self.action == "create":
+            return BorrowingCreateSerializer
         return BorrowingSerializer
