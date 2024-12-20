@@ -1,4 +1,3 @@
-from django.core.serializers import get_serializer
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
@@ -79,7 +78,6 @@ class BorrowingViewSet(
         url_path="return-borrowing",
     )
     def return_borrowing(self, request, pk=None):
-        print(f"Handling return for borrowing ID {pk}")
         borrowing = self.get_object()
         serializer = self.get_serializer(
             instance=borrowing,
