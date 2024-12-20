@@ -43,3 +43,13 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
 
         validated_data["user"] = request.user
         return super().create(validated_data)
+
+
+class BorrowingReturnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Borrowing
+        fields = ("id", "actual_return_date", "is_active")
+
+    def update(self, instance, validated_data):
+        instance.return_borrowing()
+        return instance

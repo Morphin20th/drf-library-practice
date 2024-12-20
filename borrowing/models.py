@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
+from django.utils.timezone import now
 
 from book_service.models import Book
 from user.models import User
@@ -44,6 +45,21 @@ class Borrowing(models.Model):
         if user.borrowings.filter(is_active=True).count() == 1:
             raise error_to_raise({"user": "User already has an active borrowing."})
 
+    def return_borrowing(self):
+        if self.actual_return_date:
+            raise ValidationError("It has already been returned.")
+
+        with transaction.atomic():
+            self.actual_return_date = now().date()
+            self.is_active = False
+
+            self.book.inventory += 1
+            self.book.save(update_fields=["inventory"])
+
+            super(Borrowing, self).save(
+                update_fields=["actual_return_date", "is_active"]
+            )
+
     def clean(self):
         self.validate_borrowing(
             expected_return_date=self.expected_return_date,
@@ -61,6 +77,11 @@ class Borrowing(models.Model):
         using=None,
         update_fields=None,
     ):
+        if self.actual_return_date:
+            self.is_active = False
+
+        self.full_clean()
+
         is_new = self.pk is None
 
         with transaction.atomic():
@@ -72,10 +93,6 @@ class Borrowing(models.Model):
                 self.book.inventory -= 1
                 self.book.save(update_fields=["inventory"])
 
-        if self.actual_return_date:
-            self.is_active = False
-
-        self.full_clean()
         return super(Borrowing, self).save(
             force_insert, force_update, using, update_fields
         )

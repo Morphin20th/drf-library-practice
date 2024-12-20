@@ -1,6 +1,9 @@
+from django.core.serializers import get_serializer
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from borrowing.models import Borrowing
 from borrowing.serializers import (
@@ -8,6 +11,7 @@ from borrowing.serializers import (
     BorrowingDetailSerializer,
     BorrowingListSerializer,
     BorrowingCreateSerializer,
+    BorrowingReturnSerializer,
 )
 
 
@@ -48,6 +52,8 @@ class BorrowingViewSet(
             return BorrowingDetailSerializer
         if self.action == "create":
             return BorrowingCreateSerializer
+        if self.action == "return_borrowing":
+            return BorrowingReturnSerializer
         return BorrowingSerializer
 
     def get_queryset(self):
@@ -66,3 +72,21 @@ class BorrowingViewSet(
         if self.request.user.is_staff:
             return queryset
         return queryset.filter(user=self.request.user)
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="return-borrowing",
+    )
+    def return_borrowing(self, request, pk=None):
+        print(f"Handling return for borrowing ID {pk}")
+        borrowing = self.get_object()
+        serializer = self.get_serializer(
+            instance=borrowing,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
