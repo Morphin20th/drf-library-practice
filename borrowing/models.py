@@ -28,17 +28,17 @@ class Borrowing(models.Model):
         error_to_raise,
     ):
         if expected_return_date and borrow_date:
-            if expected_return_date <= borrow_date:
+            if expected_return_date < borrow_date:
                 raise error_to_raise(
                     {
-                        "expected_return_date": "Expected return date must be later than the borrow date."
+                        "expected_return_date": "Expected return date must be later than or equal to the borrow date."
                     }
                 )
         if actual_return_date and borrow_date:
-            if actual_return_date <= borrow_date:
+            if actual_return_date < borrow_date:
                 raise error_to_raise(
                     {
-                        "actual_return_date": "Actual return date must be later than the borrow date."
+                        "actual_return_date": "Actual return date must be later or equal than the borrow date."
                     }
                 )
         if book.inventory == 0:
@@ -111,12 +111,12 @@ class Borrowing(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=models.Q(expected_return_date__gt=models.F("borrow_date")),
-                name="expected_return_date_gt_borrow_date",
+                check=models.Q(expected_return_date__gte=models.F("borrow_date")),
+                name="expected_return_date_gte_borrow_date",
             ),
             models.CheckConstraint(
-                check=models.Q(actual_return_date__gt=models.F("borrow_date")),
-                name="actual_return_date_gt_borrow_date",
+                check=models.Q(actual_return_date__gte=models.F("borrow_date")),
+                name="actual_return_date_gte_borrow_date",
             ),
         ]
 
