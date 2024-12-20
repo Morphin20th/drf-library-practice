@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "book_service",
     "user",
     "borrowing",
+    "telegram_bot",
     "drf_spectacular",
     "debug_toolbar",
 ]
