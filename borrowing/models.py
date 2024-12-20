@@ -4,6 +4,7 @@ from django.db import models, transaction
 from django.utils.timezone import now
 
 from book_service.models import Book
+from telegram_bot.telegram_helper import send_telegram_message
 from user.models import User
 
 
@@ -92,6 +93,16 @@ class Borrowing(models.Model):
                     )
                 self.book.inventory -= 1
                 self.book.save(update_fields=["inventory"])
+                try:
+                    message = (
+                        f"New Borrowing Created:\n"
+                        f"Book: {self.book.title}\n"
+                        f"User: {self.user.email}\n"
+                        f"Expected Return: {self.expected_return_date}"
+                    )
+                    send_telegram_message(message)
+                except Exception as e:
+                    raise ValidationError(f"Failed to send notification: {e}")
 
         return super(Borrowing, self).save(
             force_insert, force_update, using, update_fields
