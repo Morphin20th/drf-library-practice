@@ -53,3 +53,4 @@ python ./manage.py runserver
 - **CRUD for User Service**
 - **Borrowing Service create, retrieve, return endpoints**
 - **Filter borrowings by user ids, is_active states**
+- **Sending notifications to Telegram Chat after creating borrowing**
